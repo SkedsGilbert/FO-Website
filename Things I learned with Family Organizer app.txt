@@ -9,4 +9,4 @@ b = blod
 
 http://php.net/manual/en/mysqli-stmt.bind-param.php
 
-2.
+2. Need to make initial commit with Git Bash to set the remote.  Testing Git Gui
