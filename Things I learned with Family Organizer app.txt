@@ -1,0 +1,12 @@
+Things I learned with Family Organizer app
+
+1.In this $stmt->bind_param("ii", $user_id, $task_id); the "ii" is letting me know that the $user_id, and $task_id are both integers
+
+i = integer
+d = double
+s = string
+b = blod
+
+http://php.net/manual/en/mysqli-stmt.bind-param.php
+
+2.
