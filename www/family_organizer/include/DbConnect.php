@@ -1,6 +1,6 @@
 <?php
 
-Class DbConnect{
+class DbConnect{
 	private $conn;
 
 	function _construct(){
