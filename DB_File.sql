@@ -7,13 +7,23 @@ CREATE TABLE IF NOT EXISTS `users` (
   `active` int(1) NOT NULL DEFAULT '1',
   `name` varchar(255) DEFAULT NULL,
   `email` varchar(255) NOT NULL,
+  `group_id` varchar(255) NOT NULL,
   `password_hash` text NOT NULL,
   `api_key` varchar(32) NOT NULL,  
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 );
- 
+
+CREATE TABLE IF NOT EXISTS `groups` (
+  `id` int (11) NOT NULL AUTO_INCREMENT,
+  `hoh_email` varchar (255) NOT NULL,
+  PRIMARY KEY(`id`) 
+);
+
+ALTER TABLE `groups` ADD FOREIGN KEY ( `hoh_email` ) REFERENCES `family_organizer`.`users` (`email`)
+ON DELETE CASCADE on UPDATE CASCADE;
+
 CREATE TABLE IF NOT EXISTS `items` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `active` int(1) NOT NULL DEFAULT '1',

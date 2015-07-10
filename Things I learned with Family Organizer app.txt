@@ -13,4 +13,6 @@ http://php.net/manual/en/mysqli-stmt.bind-param.php
 
 3. Using `` vs '' made a difference in my DB script
 
-4.Blowfish (a.k.a. bcrypt) hashing is for storing passwords using PHP
+4. Blowfish (a.k.a. bcrypt) hashing is for storing passwords using PHP
+
+5. Tracking commits with GitGui for Windows does not properly track changes.
