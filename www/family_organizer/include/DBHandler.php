@@ -102,6 +102,38 @@ class DbHandler
     	}
 
     }
+
+    /**
+    * Get user by email
+    * @param String $email
+    */
+    public function getUserByEmail($email){
+    	$stmt = $this->conn->prepare("SELECT name,email,api_key,active,created_at FROM users WHERE email = ?");
+    	$stmt->bind_param("s",$email);
+    	if ($stmt->excute()) {
+    		$user = $stmt->get_result()->fetch_assoc();
+    		$stmt->close();
+    		return $user;
+    	}else{
+    		rturn NULL;
+    	}
+    }
+
+    /**
+    * Get user id by API key
+    * @param String $api_key user api key
+    */
+    public function getUserID($api_key){
+    	$stmt = $this->conn->prepare("SELECT id FROM users WHERE api_key = ?");
+    	$stmt->bind_param("s",$api_key);
+    	if ($stmt->excute()) {
+    		$user_id = $stmt->get_result()->->fetch_assoc();
+    		$stmt->close();
+    		return $user_id;
+    	}else{
+    		return NULL;
+    	}
+    }
 		
 }
 
