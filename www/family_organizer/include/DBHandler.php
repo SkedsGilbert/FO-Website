@@ -54,6 +54,14 @@ class DbHandler
 	}
 
 	/**
+	* Generate Api key
+	*/
+	public function generateApiKey(){
+		return md5(uniqid(rand(),true));
+	}
+
+
+	/**
     * Checking for duplicate user by email address
     * @param String $email email to check in db
     * @return boolean
@@ -134,7 +142,38 @@ class DbHandler
     		return NULL;
     	}
     }
-		
+
+    /**
+    * Get API key by user id
+    * @param String $user_id from user table
+    */
+	public function getApiKeyByID($user_id){
+		$stmt = $this->conn->prepare("SELECT api_key FROM users WHERE id = ?");
+		$stmt->bind_param("i", $user_id);
+		if ($stmt->excute()) {
+			$api_key = $stmt->get_result()->fetch_assoc();
+			$stmt->close();
+			return $api_key;
+		}else{
+			return NULL;
+		}
+	}	
+
+	/**
+	* Checking if API key exist
+	* @param String $api_key users api key
+	* @return boolean
+	*/
+	public function isValidApiKey($api_key){
+		$stmt = $this->conn->prepare("SELECT id FROM users WHERE api_key = ?");
+		$stmt->bind_param("s",$api_key);
+		$stmt->execute();
+		$stmt->store_result();
+		$num_rows = $stmt->num_rows;
+		$stmt->close();
+		return $num_rows > 0;
+	}
+
 }
 
 ?>
