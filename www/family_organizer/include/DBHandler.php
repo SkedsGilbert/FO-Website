@@ -52,6 +52,56 @@ class DbHandler
 		}
 		return $response;
 	}
+
+	/**
+    * Checking for duplicate user by email address
+    * @param String $email email to check in db
+    * @return boolean
+    */
+
+    public function isUserExists($email){
+    	$stmt = $this->conn->prepare("SELECT id FROM users WHERE email = ?");
+    	$stmt->bind_param("s",$email);
+    	$stmt->execute();
+    	$stmt->store_result();
+    	$num_rows = $stmt->num_rows;
+    	$stmt->close();
+    	return $num_rows >0;
+    }
+
+	/**
+    * Checking user login
+    * @param String $email User login email id
+    * @param String $password User login password
+    * @return boolean User login status success/fail
+    */
+
+    public function checkLogin($email,$password){
+    	//get user email
+    	$stmt = $this->conn->prepare("SELECT password_hash FROM users WHERE email = ?");
+    	$stmt->bind_param("s",$email);
+    	$stmt->execute();
+    	$stmt->bind_result($password_hash);
+    	$stmt->store_result();
+
+    	if ($stmt->num_rows > 0) {
+    		// user is found
+    		$stmt->fetch();
+    		$stmt->close();
+
+    		if (PassHash::check_password($password_hash,$password)) {
+    			//correct pass
+    			return TRUE;
+    		}else{
+    			return FALSE;
+    		}
+    	}else{
+    		// no known user
+    		$stmt->close();
+    		return FALSE;
+    	}
+
+    }
 		
 }
 
