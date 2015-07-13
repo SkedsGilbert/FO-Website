@@ -174,7 +174,7 @@ class DbHandler
 		return $num_rows > 0;
 	}
 
-    /*----------- Task Table Mehods-----------------------------*/
+    /*----------- items Table Mehods-----------------------------*/
 
     /**
     * Creating new items
@@ -221,7 +221,7 @@ class DbHandler
     }
 
     /**
-    * Get all item for a user
+    * Get all items for a user
     * @param String $user_id id of the user
     */
     public function getAllUserItems($user_id){
@@ -247,6 +247,22 @@ class DbHandler
         $num_affected_rows = $stmt->affected_rows;
         $stmt->close();
         return $num_affected_rows > 0;
+    }
+
+    /*----------- user_items Table Mehods-----------------------------*/
+
+    /**
+    * Function to assign an item to a user
+    * @param String $user_id id of the user
+    * @param String $item_id id of the item
+    */
+
+    public function createUserItem($user_id, $task_id){
+        $stmt = $this->conn->prepare("INSERT INTO user_items(user_id,item_id) VALUES(?,?)");
+        $stmt->bind_param("ii",$user_id,$item_id);
+        $stmt->excute();
+        $stmt->clo();
+        return $result;
     }
 
 }
