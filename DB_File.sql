@@ -1,4 +1,4 @@
--- DROP TABLE IF EXISTS family_organizer;
+-- DROP DATABASE IF EXISTS family_organizer;
 
 CREATE DATABASE family_organizer;
 
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `active` int(1) NOT NULL DEFAULT '1',
   `name` varchar(255) DEFAULT NULL,
   `email` varchar(255) NOT NULL,
-  `group_id` varchar(255) NOT NULL,
+  `group_id` varchar(255),
   `password_hash` varchar(255) NOT NULL,
   `api_key` varchar(32) NOT NULL,  
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -46,10 +46,10 @@ CREATE TABLE IF NOT EXISTS `user_items` (
   KEY `item_id` (`item_id`)
 );
  
-ALTER TABLE  `user_item` ADD FOREIGN KEY (  `user_id` ) REFERENCES  `family_organizer`.`users` (
+ALTER TABLE  `user_items` ADD FOREIGN KEY (  `user_id` ) REFERENCES  `family_organizer`.`users` (
 `id`
 ) ON DELETE CASCADE ON UPDATE CASCADE ;
  
-ALTER TABLE  `user_item` ADD FOREIGN KEY (  `items_id` ) REFERENCES  `family_organizer`.`items` (
+ALTER TABLE  `user_items` ADD FOREIGN KEY (  `item_id` ) REFERENCES  `family_organizer`.`items` (
 `id`
 ) ON DELETE CASCADE ON UPDATE CASCADE ;
