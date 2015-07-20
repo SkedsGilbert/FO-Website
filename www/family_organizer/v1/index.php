@@ -69,8 +69,12 @@ function echoResponse($status_code,$response){
 	$app->contentType('application/json');
 	echo json_encode($response);
 }
-//$app->run();
 
+/**
+* User Registration
+* method - POST
+*params - name, email, password
+*/ 
 $app->post('/register', function() use ($app){
 // check for required params
 	verifyRequiredParams(array('name','email','password'));
@@ -99,6 +103,37 @@ $app->post('/register', function() use ($app){
 		$response["message"] = "This email is already in use";
 		echoResponse(200,$response);
 	}
+});
+
+/**
+* User Login
+* method - POST
+*params - email, password
+*/ 
+$app->post('/login', function() use ($app){
+	verifyRequiredParams(array('email', 'password'));
+	$email = $app->request()->post('email');
+	$password = $app->request()->post('password');
+	$response = array();
+
+	$db = new DbHandler;
+	if ($db->checkLogin($email,$password)) {
+		$user = $db->getUserByEmail($email);
+
+		if ($user != NULL) {
+			$response["error"] = false;
+			$response['name'] = $user['email'];
+			$response['apiKey'] = $user['api_key'];
+			$response['createdAt'] = $user['created_at'];
+		}else{
+			$response['error'] = true;
+			$response['message'] = "An error has occurred.  Please try again";
+		}
+	}else{
+		$response['error'] = true;
+		$response['message'] = "Login failed.  Invalid Login";
+	}
+	echoResponse(200, $response);
 });
 
 $app->run();

@@ -21,3 +21,5 @@ http://php.net/manual/en/mysqli-stmt.bind-param.php
 	VARCHAR is stored inline with the table. VARCHAR is faster when the size is reasonable, the tradeoff of which would be faster depends upon your data and your hardware, you'd want to benchmark a realworld scenario with your data.
 
 7. insert_id — Get the ID generated in the last query
+
+8. In $response['apiKey'] = $user['api_key'];  apiKey is what is displayed in the json and api_key is the DB column.  I can call $response['apiKey'] whatever I want, but $user['api_key'] has to match what is in the DB.
