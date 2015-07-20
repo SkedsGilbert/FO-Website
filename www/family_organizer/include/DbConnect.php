@@ -7,8 +7,8 @@ class DbConnect{
 
 	}
 
-	function connect(){
-		inclued_once dirname(_FILE_).'./Config.php';
+	function connect(){		
+		include_once dirname(__FILE__) . './Config.php';
 
 		//DB connection
 		$this->conn = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);

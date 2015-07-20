@@ -1,10 +1,12 @@
 <?php
 
 require_once '../include/DbHandler.php';
-require_once '../include/PassHandler.php';
-require '.././libs/Slim/Slim.php';
+require_once '../include/PassHash.php';
+require '../libs/Slim/Slim/Slim.php';
 
 \Slim\Slim::registerAutoloader();
+
+$app = new \Slim\Slim();
 
 // Global Variable var. user id from db
 $user_id = NULL;
@@ -16,14 +18,14 @@ function verifyRequiredParams($required_fields){
 	$error = false;
 	$error_fields = "";
 	$request_params = array();
-	$request_params = $_RQUEST;
+	$request_params = $_REQUEST;
 	// Handling PUT request params
-	if($SERVER['REQUEST_METHOD'] == 'PUT'){
+	if($_SERVER['REQUEST_METHOD'] == 'PUT'){
 		$app = \SLIM\SLIM::getInstance();
 		parse_str($app->request()->getBody(), $request_params);
 	}
-	for ($required_fields as $fields) { 
-		if(!isset($request_params[fields]) || strlen(trim($request_params[$fields])) <= 0){
+	foreach ($required_fields as $fields) { 
+		if(!isset($request_params[$fields]) || strlen(trim($request_params[$fields])) <= 0){
 			$error = true;
 			$error_fields .= $fields . ', ';
 		}
@@ -35,7 +37,7 @@ function verifyRequiredParams($required_fields){
 		$response = array();
 		$app = \Slim\Slim::getInstance();
 		$response["error"] = true;
-		$response["message"] = 'Required fields(s) ' . substr(($error_fields,0,-2) . ' is missing or empty';
+		$response["message"] = 'Required fields(s) ' . substr($error_fields,0,-2) . ' is missing or empty';
 		echoResponse(400,$response);
 		$app->stop(); 
 	}
@@ -67,10 +69,38 @@ function echoResponse($status_code,$response){
 	$app->contentType('application/json');
 	echo json_encode($response);
 }
+//$app->run();
+
+$app->post('/register', function() use ($app){
+// check for required params
+	verifyRequiredParams(array('name','email','password'));
+	$response = array();
+//reading post params
+	$name = $app->request->post('name');
+	$email = $app->request->post('email');
+	$password = $app->request->post('password');
+
+//validating email params
+	validateEmail($email);
+
+	$db = new DbHandler();
+	$res = $db->createUser($name, $email, $password);
+
+	if ($res == USER_CREATED_SUCCESSFULLY) {
+		$response["error"] = false;
+		$response["message"] = "You are sucessfully registered";
+		echoResponse(201,$response);
+	}elseif ($res == USER_CREATED_FAILED) {
+		$response["error"] = true;
+		$response["message"] = "An error occurred while registereing";
+		echoResponse(200,$response);
+	}elseif ($res == USER_ALREADY_EXISTED) {
+		$response["error"] = true;
+		$response["message"] = "This email is already in use";
+		echoResponse(200,$response);
+	}
+});
+
 $app->run();
-
-
-
-
 
 ?>

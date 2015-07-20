@@ -8,10 +8,10 @@ class DbHandler
 {
 	private $conn;
 
-	function _costruct(){
-		require_once dirname(_FILE_).'./DbConnect.php';
+	function __construct(){
+		require_once dirname(__FILE__).'./DbConnect.php';
 		//open DB
-		$db = new DbConnect()
+		$db = new DbConnect();
 		$this->conn = $db->connect();
 	}
 
@@ -35,9 +35,8 @@ class DbHandler
 			//Create API key
 			$api_key = $this->generateApiKey();
 			//insert query
-			$stmt = $this->conn->prepare("INSERT INTO users(name,email,password_hash,api_key,active) values(?,?,?,?,?,1");
-				$stmt->bind_param("ssss",$name, $email, $password,$api_key);
-
+			$stmt = $this->conn->prepare("INSERT INTO users(name, email, password_hash, api_key, active) values(?, ?, ?, ?, 1)");
+			$stmt->bind_param("ssss", $name, $email, $password_hash,$api_key);
 			$result = $stmt->execute();
 			$stmt->close();
 
@@ -67,14 +66,14 @@ class DbHandler
     * @return boolean
     */
 
-    public function isUserExists($email){
+    private function isUserExists($email){
     	$stmt = $this->conn->prepare("SELECT id FROM users WHERE email = ?");
     	$stmt->bind_param("s",$email);
     	$stmt->execute();
     	$stmt->store_result();
     	$num_rows = $stmt->num_rows;
     	$stmt->close();
-    	return $num_rows >0;
+    	return $num_rows > 0;
     }
 
 	/**
@@ -123,7 +122,7 @@ class DbHandler
     		$stmt->close();
     		return $user;
     	}else{
-    		rturn NULL;
+    		return NULL;
     	}
     }
 
@@ -135,7 +134,7 @@ class DbHandler
     	$stmt = $this->conn->prepare("SELECT id FROM users WHERE api_key = ?");
     	$stmt->bind_param("s",$api_key);
     	if ($stmt->excute()) {
-    		$user_id = $stmt->get_result()->->fetch_assoc();
+    		$user_id = $stmt->get_result()->fetch_assoc();
     		$stmt->close();
     		return $user_id;
     	}else{
@@ -185,7 +184,7 @@ class DbHandler
     public function createItem($user_id,$item,$description = NULL){
         //create task row
         $stmt = $this->conn->prepare("INSERT INTO item(item,description) VALUES(?)");
-        $stmt->bind_param("s,s",$item),$description);
+        $stmt->bind_param("s,s",$item,$description);
         $result = $stmt->execute();
         $stmt->close();
 
