@@ -183,23 +183,24 @@ class DbHandler
 
     public function createItem($user_id,$item,$description = NULL){
         //create task row
-        $stmt = $this->conn->prepare("INSERT INTO item(item,description) VALUES(?)");
-        $stmt->bind_param("s,s",$item,$description);
+        $stmt = $this->conn->prepare("INSERT INTO items(item,description) VALUES(?,?)");
+        $stmt->bind_param("ss",$item,$description);
         $result = $stmt->execute();
         $stmt->close();
 
-        if(result){
+        if($result){
             //assign task to user
             $new_item_id = $this->conn->insert_id;
-            $res = $this->createUserTask($user_id,$new_item_id);
+            $user_id = 1;
+            $res = $this->createUserItem($user_id,$new_item_id);
             if ($res) {
                 //item created successfully
                 return $new_item_id;
             }else{
-                return NULL;
+                return var_dump($res);
             }
         }else{
-            return NULL;
+            return "99999";
         }
     }
 
@@ -256,11 +257,11 @@ class DbHandler
     * @param String $item_id id of the item
     */
 
-    public function createUserItem($user_id, $task_id){
+    public function createUserItem($user_id, $item_id){
         $stmt = $this->conn->prepare("INSERT INTO user_items(user_id,item_id) VALUES(?,?)");
         $stmt->bind_param("ii",$user_id,$item_id);
-        $stmt->excute();
-        $stmt->clo();
+        $result = $stmt->execute();
+        $stmt->close();
         return $result;
     }
 

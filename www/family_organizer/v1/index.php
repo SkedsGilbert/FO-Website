@@ -136,6 +136,64 @@ $app->post('/login', function() use ($app){
 	echoResponse(200, $response);
 });
 
+/**
+* Check for valid API key
+*/ 
+
+function authenticate(\Slim\Route $route){
+	// Get request headers
+	$headers = apache_request_headers();
+	$response = array();
+	$app = \Slim\Slim::getInstance();
+
+	// Verify Authorization Header
+	if(isset($header['Authorization'])){
+		$db = new DbHandler();
+
+		// Get api key
+		$api_key = $headers['Authorization'];
+
+		// Validate api key
+		if (!$db->isValidApiKey($api_key)) {
+			// api key is not present in table
+			$response["error"] = true;
+			$response["message"] = "Api key is missing";
+			echoResponse(400, $response);
+			$app->stop();
+		}
+	}
+}
+
+/**
+* Create item
+* method POST
+* params - name
+*/
+
+$app->post('/item', 'authenticate', function() use ($app) {
+	// check required params
+	verifyRequiredParams(array('item'));
+
+	$response = array();
+	$item = $app->request->post('item');
+
+	global $user_id;
+	$db = new DbHandler();
+
+	// Create item
+	$item_id = $db->createItem($user_id, $item);
+
+	if ($item_id != NULL) {
+		$response["error"] = false;
+		$response["message"] = "Item created successfully";
+		$response["item_id"] = $item_id;
+	}else{
+		$response["error"] = true;
+		$response["message"] = var_dump($item_id);
+	}
+	echoResponse(201, $response);
+});
+
 $app->run();
 
 ?>

@@ -30,8 +30,8 @@ ON DELETE CASCADE on UPDATE CASCADE;
 CREATE TABLE IF NOT EXISTS `items` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `active` int(1) NOT NULL DEFAULT '1',
-  `descripton` varchar(255),
   `item` varchar(255) NOT NULL,
+  `description` varchar(255),
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 );
