@@ -133,7 +133,7 @@ class DbHandler
     public function getUserID($api_key){
     	$stmt = $this->conn->prepare("SELECT id FROM users WHERE api_key = ?");
     	$stmt->bind_param("s",$api_key);
-    	if ($stmt->excute()) {
+    	if ($stmt->execute()) {
     		$user_id = $stmt->get_result()->fetch_assoc();
     		$stmt->close();
     		return $user_id;
@@ -209,7 +209,7 @@ class DbHandler
     * @param String $item_id for the item
     */
     public function getItem($item_id,$user_id){
-        $stmt = $this->conn->prepare("SELECT i.id, i.task, i.status, i.created FROM items, user_items ui WHERE i.id = ? AND ui.item_id = i.id AND ui.user_id = ?" );
+        $stmt = $this->conn->prepare("SELECT i.id, i.item, i.active, i.created_at FROM items i, user_items ui WHERE i.id = ? AND ui.item_id = i.id AND ui.user_id = ?" );
         $stmt->bind_param("ii", $item_id,$user_id);
         if ($stmt->execute()) {
             $item = $stmt->get_result()->fetch_assoc();
@@ -225,9 +225,9 @@ class DbHandler
     * @param String $user_id id of the user
     */
     public function getAllUserItems($user_id){
-        $stmt = $this->conn->prepare("SELECT i.* FROM items i, user_items ui WHERE i.id = ui.task_id AND ui.user_id = ?");
+        $stmt = $this->conn->prepare("SELECT i.* FROM items i, user_items ui WHERE i.id = ui.item_id AND ui.user_id = ?");
         $stmt->bind_param("i",$user_id);
-        $stmt->excute();
+        $stmt->execute();
         $items = $stmt->get_result();
         $stmt->close();
         return $items;

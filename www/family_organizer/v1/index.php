@@ -8,7 +8,7 @@ require '../libs/Slim/Slim/Slim.php';
 
 $app = new \Slim\Slim();
 
-// Global Variable var. user id from db
+// Global Variable user id from db
 $user_id = NULL;
 
 /**
@@ -147,7 +147,7 @@ function authenticate(\Slim\Route $route){
 	$app = \Slim\Slim::getInstance();
 
 	// Verify Authorization Header
-	if(isset($header['Authorization'])){
+	if(isset($headers['Authorization'])){
 		$db = new DbHandler();
 
 		// Get api key
@@ -157,10 +157,22 @@ function authenticate(\Slim\Route $route){
 		if (!$db->isValidApiKey($api_key)) {
 			// api key is not present in table
 			$response["error"] = true;
-			$response["message"] = "Api key is missing";
-			echoResponse(400, $response);
+			$response["message"] = "Access Denied.  Invalid Api key";
+			echoResponse(401,$response);
 			$app->stop();
-		}
+		}else{
+				global $user_id;
+				// get user id
+				$user = $db->getUserID($api_key);
+				if ($user != NULL) {
+					$user_id = $user["id"];
+				}
+			}
+		}else{
+		$response["error"] = true;
+		$response["message"] = "Api key is missing";
+		echoResponse(400, $response);
+		$app->stop();
 	}
 }
 
@@ -178,20 +190,48 @@ $app->post('/item', 'authenticate', function() use ($app) {
 	$item = $app->request->post('item');
 
 	global $user_id;
+	$db = new DbHandler();	
+	
+		// Create item
+		$item_id = $db->createItem($user_id, $item);
+
+		if ($item_id != NULL) {
+			$response["error"] = false;
+			$response["message"] = "Item created successfully";
+			$response["item_id"] = $item_id;
+		}else{
+			$response["error"] = true;
+			$response["message"] = "Item was not created";
+		}
+	echoResponse(201, $response);
+});
+
+/**
+* Get all items for a user
+* method Get
+*/
+
+$app->get('/items', 'authenticate',function(){
+	global $user_id;
+	$response = array();
 	$db = new DbHandler();
 
-	// Create item
-	$item_id = $db->createItem($user_id, $item);
+	// getting all items
+		$result = $db->getAllUserItems($user_id);
 
-	if ($item_id != NULL) {
 		$response["error"] = false;
-		$response["message"] = "Item created successfully";
-		$response["item_id"] = $item_id;
-	}else{
-		$response["error"] = true;
-		$response["message"] = var_dump($item_id);
-	}
-	echoResponse(201, $response);
+		$response["item"] = array();
+
+		// looping through array to prepare array
+		while ($item = $result->fetch_assoc()) {
+			$temp = array();
+			$temp["id"] = $item["id"];
+			$temp["item"] = $item["item"];
+			$temp["active"] = $item["active"];
+			$temp["createdAt"] = $item["created_at"];
+			array_push($response["item"],$temp);
+		}
+	echoResponse(200,$response);
 });
 
 $app->run();
