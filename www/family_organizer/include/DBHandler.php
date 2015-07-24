@@ -191,7 +191,6 @@ class DbHandler
         if($result){
             //assign task to user
             $new_item_id = $this->conn->insert_id;
-            $user_id = 1;
             $res = $this->createUserItem($user_id,$new_item_id);
             if ($res) {
                 //item created successfully
