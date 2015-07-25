@@ -196,10 +196,10 @@ class DbHandler
                 //item created successfully
                 return $new_item_id;
             }else{
-                return var_dump($res);
+                return NULL;
             }
         }else{
-            return "99999";
+            return NULL;
         }
     }
 
@@ -215,7 +215,7 @@ class DbHandler
             $stmt->close();
             return $item;
         }else{
-            return NULL;
+            return var_dump($stmt);
         }        
     }
 

@@ -234,6 +234,33 @@ $app->get('/items', 'authenticate',function(){
 	echoResponse(200,$response);
 });
 
+/**
+* Get single items for a user
+* Method Get
+*/
+
+$app->get('/item/:id', 'authenticate', function($item_id){
+	global $user_id;
+	$response = array();
+	$db = new DbHandler;
+
+	//get item
+	$result = $db->getItem($item_id, $user_id);
+
+	if ($result != NULL) {
+		$response["error"] = false;
+		$response["id"] = $result["id"];
+		$response["item"] = $result["item"];
+		$response["active"] = $result["active"];
+		$response["createdAt"] = $result["created_at"];
+		echoResponse(200,$response);
+	}else{
+		$response["error"] = true;
+		$response["message"] = "Item doesn't exists";
+		echoResponse(404,$response);
+	}
+});
+
 $app->run();
 
 ?>
