@@ -208,7 +208,7 @@ class DbHandler
     * @param String $item_id for the item
     */
     public function getItem($item_id,$user_id){
-        $stmt = $this->conn->prepare("SELECT i.id, i.item, i.active, i.created_at FROM items i, user_items ui WHERE i.id = ? AND ui.item_id = i.id AND ui.user_id = ?" );
+        $stmt = $this->conn->prepare("SELECT i.id, i.item, i.description, i.active, i.created_at FROM items i, user_items ui WHERE i.id = ? AND ui.item_id = i.id AND ui.user_id = ?" );
         $stmt->bind_param("ii", $item_id,$user_id);
         if ($stmt->execute()) {
             $item = $stmt->get_result()->fetch_assoc();

@@ -188,12 +188,13 @@ $app->post('/item', 'authenticate', function() use ($app) {
 
 	$response = array();
 	$item = $app->request->post('item');
+	$description = $app->request->post('description');
 
 	global $user_id;
 	$db = new DbHandler();	
 	
 		// Create item
-		$item_id = $db->createItem($user_id, $item);
+		$item_id = $db->createItem($user_id, $item, $description);
 
 		if ($item_id != NULL) {
 			$response["error"] = false;
@@ -227,6 +228,7 @@ $app->get('/items', 'authenticate',function(){
 			$temp = array();
 			$temp["id"] = $item["id"];
 			$temp["item"] = $item["item"];
+			$temp["description"] = $item["description"];
 			$temp["active"] = $item["active"];
 			$temp["createdAt"] = $item["created_at"];
 			array_push($response["item"],$temp);
@@ -251,6 +253,7 @@ $app->get('/item/:id', 'authenticate', function($item_id){
 		$response["error"] = false;
 		$response["id"] = $result["id"];
 		$response["item"] = $result["item"];
+		$response["description"] = $result["description"];
 		$response["active"] = $result["active"];
 		$response["createdAt"] = $result["created_at"];
 		echoResponse(200,$response);
