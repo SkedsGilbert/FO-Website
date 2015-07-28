@@ -239,9 +239,9 @@ class DbHandler
      * @param String $status items status
      */
 
-    public function updateItem($user_id, $item_id, $item, $active){
-        $stmt = $this->conn->prepare("UPDATE items i, user_items ui SET i.item = ?, i.active = ?,  WHERE i.id = ? AND i.id = ui.item_id AND ui.user_id =?");
-        $stmt->bind_param("siii", $task, $active, $item_id, $user_id);
+    public function updateItem($user_id, $item_id, $item, $description, $active){
+        $stmt = $this->conn->prepare("UPDATE items i, user_items ui SET i.item = ?, i.description = ?, i.active = ?  WHERE i.id = ? AND i.id = ui.item_id AND ui.user_id =?");
+        $stmt->bind_param("ssiii", $item, $description, $active, $item_id, $user_id);
         $stmt->execute();
         $num_affected_rows = $stmt->affected_rows;
         $stmt->close();

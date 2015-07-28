@@ -92,7 +92,7 @@ $app->post('/register', function() use ($app){
 
 	if ($res == USER_CREATED_SUCCESSFULLY) {
 		$response["error"] = false;
-		$response["message"] = "You are sucessfully registered";
+		$response["message"] = "You are successfully registered";
 		echoResponse(201,$response);
 	}elseif ($res == USER_CREATED_FAILED) {
 		$response["error"] = true;
@@ -263,6 +263,36 @@ $app->get('/item/:id', 'authenticate', function($item_id){
 		echoResponse(404,$response);
 	}
 });
+
+/**
+* Updating existing items
+* method Put
+* params item, description, status
+*/
+
+$app->put('/item/:id', 'authenticate', function($item_id)use($app){
+	verifyRequiredParams(array('item','active', 'description'));
+
+	global $user_id;
+	$item = $app->request->put('item');
+	$item = $app->request->post('item');
+	$active = $app->request->put('active');
+	$description = $app->request->put('description');
+
+	$db = new DbHandler;
+	$response = array();
+	$result = $db->updateItem($user_id, $item_id, $item, $description, $active);
+	if($result){
+		$response["error"] = false;
+		$response["message"] ="Item was updated successfully";
+	}else{
+		$response["error"] = true;
+		$response["message"] = "Item was not updated successfully"; 
+	}
+	echoResponse(200,$response);
+
+});
+
 
 $app->run();
 
