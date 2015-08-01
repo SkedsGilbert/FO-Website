@@ -124,7 +124,7 @@ $app->post('/login', function() use ($app){
 		if ($user != NULL) {
 			$groupResult = $db->getUserGroupIds($user['id']);
 			$response["error"] = false;
-			$response['name'] = $user['email'];
+			$response['username'] = $user['email'];
 			$response['apiKey'] = $user['api_key'];
 			$response['createdAt'] = $user['created_at'];
 			while($group = $groupResult->fetch_assoc()){
@@ -341,11 +341,30 @@ $app->post('/group', 'authenticate', function() use ($app) {
 });
 
 /**
-* Get all group id's for a user
+* Get all items for a group
 * Method Get
-* params - user id
+* params - group id
 */ 
+$app->get('/groupitems/:group_id', 'authenticate',function($group_id){
+	global $user_id;
+	$response = array();
+	$db = new DbHandler();
 
+	// getting all items
+		$result = $db->getAllGroupItems($group_id);
+		$response["error"] = false;
+		$response["items"] = array();
+		// looping through array to prepare array
+			while ($item = $result->fetch_assoc()) {
+				$temp = array();
+				$temp["item"] = $item["item"];
+				$temp["description"] = $item["description"];
+				$temp["user_id"] = $item["user_id"];
+				array_push($response["items"],$temp);
+			}
+			echoResponse(200,$response);
+		
+});
 
 $app->run();
 

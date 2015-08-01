@@ -239,6 +239,19 @@ class DbHandler
     }
 
     /**
+    * Get all items for a group
+    * @param String $group_id of the group
+    */
+    public function getAllGroupItems($group_id){
+        $stmt = $this->conn->prepare("SELECT i.item, i.description, ui.user_id FROM items i JOIN user_items ui ON ui.item_id = i.id JOIN user_groups ug ON ug.user_id = ui.user_id WHERE i.active = 1 AND ug.group_id = ?");
+        $stmt->bind_param("i",$group_id);
+        $stmt->execute();
+        $items = $stmt->get_result();
+        $stmt->close();
+        return $items;
+    }
+
+    /**
      * Updating items
      * @param String $task_id id of the items
      * @param String $items items text
@@ -308,7 +321,7 @@ class DbHandler
     }
 
     public function getUserGroupIds($user_id){
-        $stmt = $this->conn->prepare("SELECT * FROM user_groups WHERE user_id = ?  AND active = 1");
+        $stmt = $this->conn->prepare("SELECT * FROM user_groups WHERE user_id = ?  AND active = 1 ORDER BY group_id");
         $stmt->bind_param("i",$user_id);
         $stmt->execute();
         $group = $stmt->get_result();
