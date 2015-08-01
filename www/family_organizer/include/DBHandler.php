@@ -115,7 +115,7 @@ class DbHandler
     * @param String $email
     */
     public function getUserByEmail($email){
-    	$stmt = $this->conn->prepare("SELECT name, email, api_key, active, created_at FROM users WHERE email = ?");
+    	$stmt = $this->conn->prepare("SELECT id,name, email, api_key, active, created_at FROM users WHERE email = ?");
     	$stmt->bind_param("s",$email);
     	if ($stmt->execute()) {
     		$user = $stmt->get_result()->fetch_assoc();
@@ -141,6 +141,12 @@ class DbHandler
     		return NULL;
     	}
     }
+
+    /**
+    * Get User Groups
+    * @param Int $user_id from user_groups table
+    */
+
 
     /**
     * Get API key by user id
@@ -263,6 +269,53 @@ class DbHandler
         $stmt->close();
         return $result;
     }
+
+     /*----------- groups Table Mehods-----------------------------*/
+
+    /**
+    * Function to assign an item to a user
+    * @param String $user_id id of the user
+    * @param String $item_id id of the item
+    */
+    public function createGroup($user_id,$hoh_email){
+        //create task row
+        $stmt = $this->conn->prepare("INSERT INTO groups(hoh_email) VALUES(?)");
+        $stmt->bind_param("s",$hoh_email);
+        $result = $stmt->execute();
+        $stmt->close();
+
+        if($result){
+            //assign task to user
+            $new_group_id = $this->conn->insert_id;
+            $res = $this->createUserGroup($user_id,$new_group_id);
+            if ($res) {
+                //item created successfully
+                return $new_group_id;
+            }else{
+                return NULL;
+            }
+        }else{
+            return NULL;
+        }
+    }
+/*----------- user_groups Table Mehods-----------------------------*/
+    public function createUserGroup($user_id, $group_id){
+        $stmt = $this->conn->prepare("INSERT INTO user_groups(user_id,group_id) VALUES(?,?)");
+        $stmt->bind_param("ii",$user_id,$group_id);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
+
+    public function getUserGroupIds($user_id){
+        $stmt = $this->conn->prepare("SELECT * FROM user_groups WHERE user_id = ?  AND active = 1");
+        $stmt->bind_param("i",$user_id);
+        $stmt->execute();
+        $group = $stmt->get_result();
+        $stmt->close();
+        return $group;
+    }
+
 
 }
 

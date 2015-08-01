@@ -25,3 +25,17 @@ http://php.net/manual/en/mysqli-stmt.bind-param.php
 8. In $response['apiKey'] = $user['api_key'];  apiKey is what is displayed in the json and api_key is the DB column.  I can call $response['apiKey'] whatever I want, but $user['api_key'] has to match what is in the DB.
 
 9.  When using Postman to test PUT's do not use "form-data", use "x-www-form-urlencoded"
+
+10.  Add an array element by first creating a temp array then simply add the array to the response like the other elements.  Example...
+
+while($group = $groupResult->fetch_assoc()){
+				//Looping through to add each group to groupResponse[]
+				$temp = array();
+				$temp['group_id'] = $group['group_id'];
+				array_push($groupResponse["group"], $temp);
+			}
+			//Add groupResponse[] to the response[]
+			$response['groups'] = $groupResponse["group"];
+
+11.
+

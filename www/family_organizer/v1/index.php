@@ -115,16 +115,26 @@ $app->post('/login', function() use ($app){
 	$email = $app->request()->post('email');
 	$password = $app->request()->post('password');
 	$response = array();
+	$groupResponse["group"] = array();
 
 	$db = new DbHandler;
 	if ($db->checkLogin($email,$password)) {
 		$user = $db->getUserByEmail($email);
 
 		if ($user != NULL) {
+			$groupResult = $db->getUserGroupIds($user['id']);
 			$response["error"] = false;
 			$response['name'] = $user['email'];
 			$response['apiKey'] = $user['api_key'];
 			$response['createdAt'] = $user['created_at'];
+			while($group = $groupResult->fetch_assoc()){
+				//Looping through to add each group to groupResponse[]
+				$temp = array();
+				$temp['group_id'] = $group['group_id'];
+				array_push($groupResponse["group"], $temp);
+			}
+			//Add groupResponse[] to the response[]
+			$response['groups'] = $groupResponse["group"];
 		}else{
 			$response['error'] = true;
 			$response['message'] = "An error has occurred.  Please try again";
@@ -271,11 +281,10 @@ $app->get('/item/:id', 'authenticate', function($item_id){
 */
 
 $app->put('/item/:id', 'authenticate', function($item_id)use($app){
-	verifyRequiredParams(array('item','active', 'description'));
+	verifyRequiredParams(array('item'));
 
 	global $user_id;
 	$item = $app->request->put('item');
-	$item = $app->request->post('item');
 	$active = $app->request->put('active');
 	$description = $app->request->put('description');
 
@@ -292,6 +301,50 @@ $app->put('/item/:id', 'authenticate', function($item_id)use($app){
 	echoResponse(200,$response);
 
 });
+
+$app->post('/group', 'authenticate', function() use ($app) {
+	// check required params
+	verifyRequiredParams(array('hoh_email'));
+
+	$response = array();
+	$hoh_email = $app->request->post('hoh_email');
+	$group_id = $app->request->post('group_id');
+
+	global $user_id;
+	$db = new DbHandler();	
+	
+	// If the response doesn't have a group_id then create the group and add the user.
+	if($group_id == NULL){
+		$group_id = $db->createGroup($user_id, $hoh_email);
+
+		if ($group_id != NULL) {
+			$response["error"] = false;
+			$response["message"] = "Group created successfully";
+			$response["group_id"] = $group_id;
+		}else{
+			$response["error"] = true;
+			$response["message"] = "Group was not created";
+		}
+	// If the response does have a group_id and the user to that group.	
+	}else if($group_id != NULL){
+		$isCreated = $db->createUserGroup($user_id,$group_id);
+		if($isCreated){
+			$response["error"] = false;
+			$response["message"] = "User was added to group";
+			$response["group_id"] = $group_id;
+		}else{
+			$response["error"] = true;
+			$response["message"] = "User was not added to group";
+		}
+	}
+	echoResponse(201, $response);
+});
+
+/**
+* Get all group id's for a user
+* Method Get
+* params - user id
+*/ 
 
 
 $app->run();
