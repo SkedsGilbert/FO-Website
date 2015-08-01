@@ -53,3 +53,21 @@ ALTER TABLE  `user_items` ADD FOREIGN KEY (  `user_id` ) REFERENCES  `family_org
 ALTER TABLE  `user_items` ADD FOREIGN KEY (  `item_id` ) REFERENCES  `family_organizer`.`items` (
 `id`
 ) ON DELETE CASCADE ON UPDATE CASCADE ;
+
+CREATE TABLE IF NOT EXISTS `user_groups` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `active` int(1) NOT NULL DEFAULT '1',
+  `user_id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `group_id` (`group_id`)
+);
+
+ALTER TABLE  `user_groups` ADD FOREIGN KEY (  `user_id` ) REFERENCES  `family_organizer`.`users` (
+`id`
+) ON DELETE CASCADE ON UPDATE CASCADE ;
+ 
+ALTER TABLE  `user_groups` ADD FOREIGN KEY (  `group_id` ) REFERENCES  `family_organizer`.`items` (
+`id`
+) ON DELETE CASCADE ON UPDATE CASCADE ;
